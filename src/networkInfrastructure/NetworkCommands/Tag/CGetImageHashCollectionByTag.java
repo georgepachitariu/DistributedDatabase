@@ -1,8 +1,8 @@
-package networkInfrastructure.NetworkCommands.Tag;
+package NetworkInfrastructure.NetworkCommands.Tag;
 
 import Data.DatabaseSystem;
-import networkInfrastructure.NetworkCommands.NetworkCommand;
-import networkInfrastructure.ServerNetworkInfo;
+import NetworkInfrastructure.NetworkCommands.NetworkCommand;
+import NetworkInfrastructure.ServerNetworkInfo;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -58,6 +58,7 @@ public class CGetImageHashCollectionByTag extends NetworkCommand {
         String hash=in.readUTF();
         LinkedList<Long> list = databaseSystem.getLocalDataSystem().
                 getImageHashes(hash);
+        if(list==null) list=new LinkedList<Long>();
 
         // we send the hashes to the requester
         out.writeInt(list.size());  //the size of the list

@@ -1,9 +1,10 @@
 package Data;
 
-import ConsistentHashing.HashRange;
+import ConsistentHashing.HelpingClasses.HashRange;
 
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Set;
 
 /**
  * Created with IntelliJ IDEA.
@@ -53,6 +54,24 @@ public class LocalTagStorage {
         else    return false;
     }
 
+    public LinkedList<Long> getAllTagKeysInRange(HashRange range) {
+        LinkedList<Long> returnList=new LinkedList<Long>();
+        Set<Long> keySet = this.storage.keySet();
+        for(Long key : keySet)
+            if(range.contains(key))
+                returnList.add(key);
+        return  returnList;
+    }
 
+    public void deleteAllTagsInRange(HashRange h) {
+        LinkedList<Long> list = this.getAllTagKeysInRange(h);
+        for(Long key : list) {
+            // by overwriting with null, we delete the previous data
+            this.storage.put(key,null);
+        }
+    }
 
+    public void setRange(HashRange range) {
+        this.range = range;
+    }
 }

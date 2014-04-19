@@ -1,6 +1,6 @@
 package Data;
 
-import ConsistentHashing.HashRange;
+import ConsistentHashing.HelpingClasses.HashRange;
 
 import java.io.File;
 import java.nio.file.Paths;
@@ -65,7 +65,18 @@ public class LocalImageStorage {
         return returnList;
     }
 
+    public void setRange(HashRange range) {
+        this.range = range;
+    }
+
     public HashRange getRange() {
         return range;
+    }
+
+    public void deleteAllImagesInRange(HashRange h) {
+        LinkedList<ImageWithMetadata> imagesToBeDeleted =
+                this.getAllImagesInRange(h);
+        for(ImageWithMetadata image: imagesToBeDeleted)
+            this.deleteImage(image.fileName);
     }
 }

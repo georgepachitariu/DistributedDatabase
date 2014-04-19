@@ -1,6 +1,6 @@
 package networkInfrastructure.NetworkCommands;
 
-import ConsistentHashing.HashRange;
+import ConsistentHashing.HelpingClasses.HashRange;
 import Data.DatabaseSystem;
 import Data.ImageWithMetadata;
 import networkInfrastructure.ServerNetworkInfo;
@@ -19,7 +19,7 @@ import java.util.LinkedList;
 public class CRequestRawData extends NetworkCommand {
 
     private HashRange dataRange;
-    private final DatabaseSystem requester;
+    private DatabaseSystem requester;
     private ServerNetworkInfo source;
 
     public CRequestRawData(HashRange dataRange,ServerNetworkInfo source,
@@ -70,6 +70,7 @@ public class CRequestRawData extends NetworkCommand {
 
         //we send the number of images
         out.writeInt(imagesList.size());
+        out.flush();
 
         // we serialise and send the images
         for(ImageWithMetadata img : imagesList) {

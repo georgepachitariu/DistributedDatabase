@@ -1,8 +1,7 @@
-package networkInfrastructure.NetworkCommands;
+package NetworkInfrastructure.NetworkCommands;
 
 import Data.DatabaseSystem;
-import Data.ImageWithMetadata;
-import networkInfrastructure.ServerNetworkInfo;
+import NetworkInfrastructure.ServerNetworkInfo;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -17,8 +16,6 @@ import java.util.LinkedList;
  */
 public class CGetServersAddresses extends NetworkCommand {
 
-    // request members
-    private ImageWithMetadata imageWithMetadata;
     // response members
     private LinkedList<ServerNetworkInfo> serversRequested;
 

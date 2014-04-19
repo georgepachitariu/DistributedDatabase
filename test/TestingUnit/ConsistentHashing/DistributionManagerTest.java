@@ -2,11 +2,11 @@
 package TestingUnit.ConsistentHashing;
 
 import ConsistentHashing.DistributionManager;
-import ConsistentHashing.HashRange;
+import ConsistentHashing.HelpingClasses.HashRange;
 import ConsistentHashing.HelpingClasses.DataMovingCoordinatesStruct;
 import ConsistentHashing.HelpingClasses.ServerSegmentsStruct;
 import junit.framework.Assert;
-import networkInfrastructure.ServerNetworkInfo;
+import NetworkInfrastructure.ServerNetworkInfo;
 
 import java.util.LinkedList;
 import java.util.Random;
@@ -28,9 +28,11 @@ public class DistributionManagerTest {
 
     @org.junit.Test
     public void testGetNewVirtualNodeWithMetadata_ForTheFirstPoint() {
-        DistributionManager test= new DistributionManager(100,0,new Random(),null, null);
+        LinkedList<ServerSegmentsStruct> existingServers=new LinkedList<ServerSegmentsStruct>();
+        existingServers.add(new ServerSegmentsStruct());
+        DistributionManager test= new DistributionManager(100,0,new Random(), existingServers,1,1);
 
-       DataMovingCoordinatesStruct el = test.createNewVirtualNodeWithMetadata(null);
+       DataMovingCoordinatesStruct el = test.createNewVirtualNode(existingServers,false);
 
         Assert.assertEquals(el.existingNodeListID, null);
         Assert.assertEquals(el.existingNodeSegment, null);
@@ -41,18 +43,14 @@ public class DistributionManagerTest {
     @org.junit.Test
     public void testGetNewVirtualNodeWithMetadata_ForASingleServerAndASingleSegment() {
 
-        LinkedList<HashRange> pairList=
-                new LinkedList<HashRange>();
+        LinkedList<HashRange> pairList=new LinkedList<HashRange>();
         pairList.add(new HashRange(0,100));
 
-        LinkedList<ServerSegmentsStruct> testList=
-                new LinkedList<ServerSegmentsStruct>();
-
+        LinkedList<ServerSegmentsStruct> testList=new LinkedList<ServerSegmentsStruct>();
         testList.add(new ServerSegmentsStruct(pairList,null,new ServerNetworkInfo("hello:1")));
 
-        DistributionManager test= new DistributionManager(100,0,new Random(),null,null);
-
-        DataMovingCoordinatesStruct el = test.createNewVirtualNodeWithMetadata(testList);
+        DistributionManager test= new DistributionManager(100,0,new Random(),null,1,1);
+        DataMovingCoordinatesStruct el = test.createNewVirtualNode(testList, true);
 
         Assert.assertEquals(el.existingNodeListID.size(), 1);
         Assert.assertEquals(true,el.existingNodeListID.getFirst().toString().equals(new ServerNetworkInfo("hello:1").toString()));
@@ -88,13 +86,13 @@ public class DistributionManagerTest {
         Random rand=mock(Random.class);
         when(rand.nextLong()).thenReturn((long)56);
 
-        DistributionManager test= new DistributionManager(100,0,rand,null, null);
+        DistributionManager test= new DistributionManager(100,0,rand, null,1,1);
 
         testList.add(new ServerSegmentsStruct(pairList1,null, new ServerNetworkInfo("hello:1")));
         testList.add(new ServerSegmentsStruct(pairList2,null, new ServerNetworkInfo("hello:2")));
 
 
-        DataMovingCoordinatesStruct el = test.createNewVirtualNodeWithMetadata(testList);
+        DataMovingCoordinatesStruct el = test.createNewVirtualNode(testList, true);
 
         Assert.assertEquals(el.existingNodeListID.size(), 2);
         Assert.assertEquals(true, el.existingNodeListID.get(0).toString().equals(new ServerNetworkInfo("hello:1").toString()));

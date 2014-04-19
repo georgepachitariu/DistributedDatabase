@@ -1,8 +1,8 @@
 package TestingFunctionality;
 
 import ConsistentHashing.DistributionManager;
-import ConsistentHashing.HashRange;
-import ConsistentHashing.HashingFunction;
+import ConsistentHashing.HelpingClasses.HashRange;
+import ConsistentHashing.HelpingClasses.HashingFunction;
 import ConsistentHashing.HelpingClasses.ServerSegmentsStruct;
 import Data.DatabaseSystem;
 import Data.ImageWithMetadata;
@@ -10,9 +10,9 @@ import Data.LocalDataSystem;
 import Interface.ClientTools;
 import Interface.DatabaseConnection;
 import junit.framework.Assert;
-import networkInfrastructure.IncomingConnectionsThread;
-import networkInfrastructure.NetworkCommands.CCloseThread;
-import networkInfrastructure.ServerNetworkInfo;
+import NetworkInfrastructure.IncomingConnectionsThread;
+import NetworkInfrastructure.NetworkCommands.CCloseThread;
+import NetworkInfrastructure.ServerNetworkInfo;
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.Before;
@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.LinkedList;
+import java.util.Random;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -61,7 +62,6 @@ public class TestingDataSystem_Distributed {
         str3.tags.add("snow");
 
 
-
     // 1. We create two DatabaseSystem's
         String root="test/DemoStorage/";
 
@@ -74,47 +74,50 @@ public class TestingDataSystem_Distributed {
         when(mockHashingFunction.getTagHash("tiger")).thenReturn((long) 26);
 
         LinkedList<ServerNetworkInfo> allServers=new LinkedList<ServerNetworkInfo>();
-        allServers.add(new ServerNetworkInfo("127.0.0.1:8001"));
-        allServers.add(new ServerNetworkInfo("127.0.0.1:8002"));
+        allServers.add(new ServerNetworkInfo("127.0.0.1:7001"));
+        allServers.add(new ServerNetworkInfo("127.0.0.1:7002"));
 
         // Server1
-        LocalDataSystem localSystem= new LocalDataSystem(root+"1/",mockHashingFunction);
+        LocalDataSystem localSystem= new LocalDataSystem(mockHashingFunction , root+"1/");
         localSystem.addDataVirtualNode(new HashRange(0, 100));
         localSystem.addTagVirtualNode(new HashRange(0, 100));
 
         DatabaseSystem databaseSystem1=new DatabaseSystem(
-                new ServerNetworkInfo("127.0.0.1:8001"),
+                new ServerNetworkInfo("127.0.0.1:7001"),
                 localSystem,null);
         databaseSystem1.setIncomingConnectionsThread(
                 new IncomingConnectionsThread(databaseSystem1));
 
         // Server2
-        LocalDataSystem localSystem2= new LocalDataSystem(root+"2/",mockHashingFunction);
+        LocalDataSystem localSystem2= new LocalDataSystem(mockHashingFunction , root+"2/");
         localSystem2.addDataVirtualNode(new HashRange(100,200));
         localSystem2.addTagVirtualNode(new HashRange(100,200));
 
         DatabaseSystem databaseSystem2=new DatabaseSystem(
-                new ServerNetworkInfo("127.0.0.1:8002"),
+                new ServerNetworkInfo("127.0.0.1:7002"),
                 localSystem2, null);
         databaseSystem2.setIncomingConnectionsThread(
                 new IncomingConnectionsThread(databaseSystem2));
 
-        ///////////////////////////////////////////////////////////////////////////
         LinkedList <ServerSegmentsStruct> list=new LinkedList<ServerSegmentsStruct>();
         list.add(databaseSystem1.getServerRanges());
         list.add(databaseSystem2.getServerRanges());
 
-        DistributionManager distr1=new DistributionManager(databaseSystem1);
+        DistributionManager distr1=new DistributionManager(1,1);
+        distr1.setDatabaseSystem(databaseSystem1);
         distr1.setExistingServers(list);
         databaseSystem1.setDistributionManager(distr1);
 
-        DistributionManager distr2=new DistributionManager(databaseSystem2);
+        DistributionManager distr2=new DistributionManager(1,1);
+        distr1.setDatabaseSystem(databaseSystem2);
         distr2.setExistingServers(list);
         databaseSystem2.setDistributionManager(distr2);
 
-        // 2. We create a cnnection from the client
+        ///////////////////////////////////////////////////////////////////////////
+
+        // 2. We create a connection from the client
         DatabaseConnection connection=new DatabaseConnection(
-                allServers, mockHashingFunction, new ClientTools());
+                allServers, mockHashingFunction, new ClientTools(), new Random());
 
         // 3. We insert the image
         connection.insert(str1);
@@ -146,12 +149,16 @@ public class TestingDataSystem_Distributed {
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // We search for images in the database
-        LinkedList<ImageWithMetadata> returnedList = connection.get("tiger");
+        LinkedList<String> tags = new LinkedList<String>();
+        tags.add("tiger");
+        LinkedList<ImageWithMetadata> returnedList = connection.get(tags);
 
         Assert.assertEquals(true, returnedList.contains(str2));
         Assert.assertEquals(true, returnedList.contains(str3));
 
-        returnedList = connection.get("snow");
+        tags = new LinkedList<String>();
+        tags.add("snow");
+        returnedList = connection.get(tags);
 
         Assert.assertEquals(true, returnedList.contains(str1));
         Assert.assertEquals(true, returnedList.contains(str2));
@@ -161,10 +168,20 @@ public class TestingDataSystem_Distributed {
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        // We delete an image from the database
+        // We delete an image str1 from the database
+
+        boolean result=connection.delete(str1);
+        Assert.assertTrue(result);
+
+        // We search again for image "str1" in the database
+        tags = new LinkedList<String>();
+        tags.add("snow");
+        returnedList = connection.get(tags);
+        // And we assert that we don't find it now
+        Assert.assertEquals(false, returnedList.contains(str1));
 
 
-
+        // We tell the database servers to close their listening threads
         CCloseThread command= new CCloseThread(databaseSystem1.getServerNetworkInfo());
         command.request();
         command= new CCloseThread(databaseSystem2.getServerNetworkInfo());

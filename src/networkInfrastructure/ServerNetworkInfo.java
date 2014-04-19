@@ -1,4 +1,4 @@
-package networkInfrastructure;
+package NetworkInfrastructure;
 
 public class ServerNetworkInfo {
 

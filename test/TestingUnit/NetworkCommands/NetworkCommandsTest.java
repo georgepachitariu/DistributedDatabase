@@ -1,25 +1,19 @@
 package TestingUnit.NetworkCommands;
 
 import ConsistentHashing.DistributionManager;
-import ConsistentHashing.HashRange;
-import ConsistentHashing.HashingFunction;
+import ConsistentHashing.HelpingClasses.HashRange;
+import ConsistentHashing.HelpingClasses.HashingFunction;
+import ConsistentHashing.HelpingClasses.ServerSegmentsStruct;
 import Data.DatabaseSystem;
 import Data.ImageWithMetadata;
 import Data.LocalDataSystem;
-import networkInfrastructure.IncomingConnectionsThread;
-import networkInfrastructure.NetworkCommands.CCloseThread;
-import networkInfrastructure.NetworkCommands.CGetServerOperationsLoadNumber;
-import networkInfrastructure.NetworkCommands.CGetServersAddresses;
-import networkInfrastructure.NetworkCommands.CRequestRawData;
-import networkInfrastructure.NetworkCommands.Image.CDeleteImage;
-import networkInfrastructure.NetworkCommands.Image.CGetImage;
-import networkInfrastructure.NetworkCommands.Image.CGetServersResponsibleForImageHash;
-import networkInfrastructure.NetworkCommands.Image.CInsertImage;
-import networkInfrastructure.NetworkCommands.Tag.CDeleteTag;
-import networkInfrastructure.NetworkCommands.Tag.CGetImageHashCollectionByTag;
-import networkInfrastructure.NetworkCommands.Tag.CGetServersResponsibleForTagHash;
-import networkInfrastructure.NetworkCommands.Tag.CInsertTag;
-import networkInfrastructure.ServerNetworkInfo;
+import NetworkInfrastructure.IncomingConnectionsThread;
+import NetworkInfrastructure.NetworkCommands.CGetServersAddresses;
+import NetworkInfrastructure.NetworkCommands.CPing;
+import NetworkInfrastructure.NetworkCommands.CUpdateServersRanges;
+import NetworkInfrastructure.NetworkCommands.Image.*;
+import NetworkInfrastructure.NetworkCommands.Tag.*;
+import NetworkInfrastructure.ServerNetworkInfo;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -46,6 +40,7 @@ public class NetworkCommandsTest {
     private static ServerNetworkInfo serverNetworkInfo;
     private static DatabaseSystem databaseSystem;
     private static IncomingConnectionsThread incomingConnectionsThread;
+    static private int initialPort=8200;
 
     @Before
     public void setUp() {        // Initialize stuff before every test
@@ -53,6 +48,7 @@ public class NetworkCommandsTest {
         serverNetworkInfo=mock(ServerNetworkInfo.class);
         when(serverNetworkInfo.getIP()).thenReturn("127.0.0.1");
         when(serverNetworkInfo.getPort()).thenReturn(8200);
+        when(serverNetworkInfo.toString()).thenReturn("127.0.0.1:"+initialPort++);
 
         databaseSystem = mock(DatabaseSystem.class);
         when(databaseSystem.getServerNetworkInfo()).thenReturn(serverNetworkInfo);
@@ -72,7 +68,7 @@ public class NetworkCommandsTest {
 
         //images to be transferred
         LinkedList<String> tags = new LinkedList<String>();
-        tags.add("fox");
+        tags.add("tiger");
         tags.add("winter");
         ImageWithMetadata img1=new ImageWithMetadata("test1",null,tags);
         img1.raw= Files.readAllBytes(Paths.get(path1));
@@ -120,7 +116,7 @@ public class NetworkCommandsTest {
 
         //image to be transferred
         LinkedList<String> tags = new LinkedList<String>();
-        tags.add("fox");
+        tags.add("tiger");
         tags.add("winter");
         ImageWithMetadata img=new ImageWithMetadata("test1",null,tags);
 
@@ -150,7 +146,7 @@ public class NetworkCommandsTest {
 
         //images to be transferred
         LinkedList<String> tags = new LinkedList<String>();
-        tags.add("fox");
+        tags.add("tiger");
         tags.add("winter");
         ImageWithMetadata img=new ImageWithMetadata("test1", null, tags);
         String path="test/ImagesData/the_tiger_and_the_snow.jpg";
@@ -231,7 +227,7 @@ public class NetworkCommandsTest {
         when( databaseSystem.getLocalDataSystem() ).thenReturn(LocalDataSystem);
 
         // the client
-        CDeleteTag command=new CDeleteTag(serverNetworkInfo, tag, imageValueHash);
+        CDeleteTag command=new CDeleteTag(serverNetworkInfo, tagHash, imageValueHash);
 
         boolean response=command.request();   // we execute the command
         Assert.assertEquals(true,response);
@@ -268,14 +264,16 @@ public class NetworkCommandsTest {
             throws IOException {
 
         //Network Info to be transferred
+        LinkedList<ServerNetworkInfo> list=new LinkedList<ServerNetworkInfo>();
         ServerNetworkInfo requestedServer=new ServerNetworkInfo(
                 "127.0.0.1",5678
         );
+        list.add(requestedServer);
 
         // creating the server
         DistributionManager mockDistributionManage=mock(DistributionManager.class);
         when(mockDistributionManage.getServersResponsibleForImageHash(100)).
-                thenReturn(requestedServer);
+                thenReturn(list);
         when(databaseSystem.getDataDistributionManager()).thenReturn(mockDistributionManage);
 
         //creating the client
@@ -286,9 +284,10 @@ public class NetworkCommandsTest {
         boolean result=command.request(); // we execute the command
         Assert.assertEquals(true, result);
 
+
         // checking results
         Assert.assertEquals(true, requestedServer.toString().equals(
-                command.getServerRequested().toString()));
+                command.getServersRequested().getFirst().toString()));
     }
 
     @Test
@@ -296,14 +295,16 @@ public class NetworkCommandsTest {
             throws IOException {
 
         //Network Info to be transferred
+        LinkedList<ServerNetworkInfo> list=new LinkedList<ServerNetworkInfo>();
         ServerNetworkInfo requestedServer=new ServerNetworkInfo(
                 "127.0.0.1",5678
         );
+        list.add(requestedServer);
 
         // creating the server
         DistributionManager mockDistributionManage=mock(DistributionManager.class);
         when(mockDistributionManage.getServersResponsibleForTagHash(100)).
-                thenReturn(requestedServer);
+                thenReturn(list);
         when(databaseSystem.getDataDistributionManager()).thenReturn(mockDistributionManage);
 
         //creating the client
@@ -316,7 +317,7 @@ public class NetworkCommandsTest {
 
         // checking results
         Assert.assertEquals(true, requestedServer.toString().equals(
-                command.getServerRequested().toString() ));
+                command.getServersRequested().getFirst().toString() ));
     }
 
 
@@ -351,33 +352,109 @@ public class NetworkCommandsTest {
     }
 
     @Test
-    public void testCGetServerOperationsLoadNumber_goodScenario() throws IOException {
-        when(incomingConnectionsThread.getCommandsQueueLoadNumber()).thenReturn(3);
-        when(databaseSystem.getIncomingConnectionsThread()).thenReturn(incomingConnectionsThread);
+    public void testCRequestRawTags_goodScenario() throws IOException {
 
-        // the client
-        CGetServerOperationsLoadNumber command=
-                new CGetServerOperationsLoadNumber(serverNetworkInfo);
+        //images to be transferred
+        LinkedList<Long> tagHashes = new LinkedList<Long>();
+        tagHashes.add((long)100);
+        tagHashes.add((long)200);
 
-        boolean response=command.request();   // we execute the command
-        Assert.assertEquals(true,response);
-        Assert.assertEquals(3,command.getLoadNumber());
-    }
+        LinkedList<Long> imageHashes1 = new LinkedList<Long>();
+        imageHashes1.add((long)15);
+        imageHashes1.add((long)25);
 
-   // CCloseThread
-    @Test
-    public void testCCloseThread_goodScenario() throws IOException {
-        incomingConnectionsThread.setAlive(true);
-        when(incomingConnectionsThread.isThreadAlive()).thenCallRealMethod();
-        incomingConnectionsThread.isThreadAlive();
-        incomingConnectionsThread.isThreadAlive();
-        when(databaseSystem.getIncomingConnectionsThread()).thenReturn(incomingConnectionsThread);
+        LinkedList<Long> imageHashes2 = new LinkedList<Long>();
+        imageHashes2.add((long)30);
 
-        // the client
-        CCloseThread command= new CCloseThread(serverNetworkInfo);
+        // creating the server
+        LocalDataSystem mockLocalDataSystem=mock(LocalDataSystem.class);
+        when(mockLocalDataSystem.getAllTagsInRange(Matchers.any(HashRange.class))).thenReturn(tagHashes);
+        when(mockLocalDataSystem.getImageHashes(100)).thenReturn(imageHashes1);
+        when(mockLocalDataSystem.getImageHashes(200)).thenReturn(imageHashes2);
+        when(databaseSystem.getLocalDataSystem()).thenReturn(mockLocalDataSystem);
 
+
+        //creating the client
+        LocalDataSystem LocalDataSystemMock=mock(LocalDataSystem.class);
+        when(LocalDataSystemMock.insertTag(anyLong(),anyLong())).thenReturn(true);
+
+        DatabaseSystem clientD = mock(DatabaseSystem.class);
+        when(clientD.getLocalDataSystem()).thenReturn(LocalDataSystemMock);
+
+        // creating and executing the command
+        HashRange h=new HashRange(0,300);
+        CRequestRawTags command=new CRequestRawTags(h,serverNetworkInfo,clientD);
         command.request();   // we execute the command
 
-        Assert.assertEquals(false,incomingConnectionsThread.isThreadAlive());
+        // checking results
+        ArgumentCaptor<Long> argument1 =ArgumentCaptor.forClass(Long.class);
+        ArgumentCaptor<Long> argument2 =ArgumentCaptor.forClass(Long.class);
+
+        verify(LocalDataSystemMock, times(3)).insertTag(argument1.capture(), argument2.capture());
+        List<Long> arguments1 = argument1.getAllValues();
+        List<Long> arguments2= argument2.getAllValues();
+
+        Assert.assertEquals((long)arguments1.get(0), (long)100);
+        Assert.assertEquals((long)arguments2.get(0), (long)15);
+        Assert.assertEquals((long)arguments1.get(1), (long)100);
+        Assert.assertEquals((long)arguments2.get(1), (long)25);
+        Assert.assertEquals((long)arguments1.get(2), (long)200);
+        Assert.assertEquals((long)arguments2.get(2), (long)30);
+    }
+
+
+    @Test
+    public void testCPing_goodScenario() throws IOException {
+        //creating the client
+
+        // creating and executing the command
+        CPing command=new CPing(serverNetworkInfo);
+        boolean result=command.request(); // we execute the command
+        Assert.assertEquals(true, result);
+    }
+
+    @Test
+    public void testCUpdateServersRanges() throws IOException {
+        // setting the client side
+        LinkedList<ServerSegmentsStruct> newServerRanges=
+                new LinkedList<ServerSegmentsStruct>();
+        LinkedList<HashRange> list = new LinkedList<HashRange>();
+        list.add(new HashRange(75,100));
+        newServerRanges.add(
+                new ServerSegmentsStruct(list,list,serverNetworkInfo));
+
+
+
+        // setting the server side
+        // setting the old segments (0-100);
+        ArgumentCaptor<HashRange> argument =
+                ArgumentCaptor.forClass(HashRange.class);
+        LinkedList<HashRange> dataRanges=new LinkedList<HashRange>();
+        dataRanges.add(new HashRange(0,100));
+
+        LocalDataSystem mockLocalDataSystem=mock(LocalDataSystem.class);
+        when(mockLocalDataSystem.getDataRanges()).thenReturn(dataRanges);
+        when(mockLocalDataSystem.getTagRanges()).thenReturn(dataRanges);
+
+        when(databaseSystem.getServerNetworkInfo()).thenReturn(serverNetworkInfo);
+        when(databaseSystem.getLocalDataSystem()).thenReturn(mockLocalDataSystem);
+
+        DistributionManager mockDistributionManager= mock(DistributionManager.class);
+        when(databaseSystem.getDistributionManager()).thenReturn(mockDistributionManager);
+
+
+        // making the command
+        CUpdateServersRanges command=
+                new CUpdateServersRanges (serverNetworkInfo,newServerRanges);
+        command.request();   // we execute the command
+
+        // verifying interactions
+        try{
+            Thread.currentThread().sleep(200); // we make it wait a little to make
+            // sure that we sent the command through the socket
+        } catch (InterruptedException e) {        }
+        verify(mockDistributionManager).setExistingServers(newServerRanges);
+        verify(mockLocalDataSystem).deleteAllImagesInRange(new HashRange(0,75));
+        verify(mockLocalDataSystem).deleteAllITagsInRange(new HashRange(0,75));
     }
 }

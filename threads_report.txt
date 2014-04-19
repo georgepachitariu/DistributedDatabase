@@ -1,0 +1,81 @@
+Thread-16@404, prio=5, in group 'main', status: 'RUNNING'
+	  at java.net.DualStackPlainSocketImpl.accept0(DualStackPlainSocketImpl.java:-1)
+	  at java.net.DualStackPlainSocketImpl.socketAccept(DualStackPlainSocketImpl.java:121)
+	  at java.net.AbstractPlainSocketImpl.accept(AbstractPlainSocketImpl.java:398)
+	  at java.net.PlainSocketImpl.accept(PlainSocketImpl.java:183)
+	  at java.net.ServerSocket.implAccept(ServerSocket.java:522)
+	  at java.net.ServerSocket.accept(ServerSocket.java:490)
+	  at NetworkInfrastructure.IncomingConnectionsThread.run(IncomingConnectionsThread.java:39)
+	  at java.lang.Thread.run(Thread.java:722)
+
+Thread-2@390, prio=5, in group 'main', status: 'RUNNING'
+	  at java.net.SocketInputStream.socketRead0(SocketInputStream.java:-1)
+	  at java.net.SocketInputStream.read(SocketInputStream.java:150)
+	  at java.net.SocketInputStream.read(SocketInputStream.java:121)
+	  at java.net.SocketInputStream.read(SocketInputStream.java:203)
+	  at java.io.DataInputStream.readBoolean(DataInputStream.java:242)
+	  at NetworkInfrastructure.NetworkCommands.CPing.request(CPing.java:33)
+	  at NetworkInfrastructure.IncomingConnectionsThread.checkForNonResponsiveServers(IncomingConnectionsThread.java:61)
+	  at NetworkInfrastructure.IncomingConnectionsThread.run(IncomingConnectionsThread.java:44)
+	  at java.lang.Thread.run(Thread.java:722)
+
+Thread-0@359, prio=5, in group 'main', status: 'RUNNING'
+	  at java.net.SocketInputStream.socketRead0(SocketInputStream.java:-1)
+	  at java.net.SocketInputStream.read(SocketInputStream.java:150)
+	  at java.net.SocketInputStream.read(SocketInputStream.java:121)
+	  at java.net.SocketInputStream.read(SocketInputStream.java:203)
+	  at java.io.DataInputStream.readBoolean(DataInputStream.java:242)
+	  at NetworkInfrastructure.NetworkCommands.CPing.request(CPing.java:33)
+	  at NetworkInfrastructure.IncomingConnectionsThread.checkForNonResponsiveServers(IncomingConnectionsThread.java:61)
+	  at NetworkInfrastructure.IncomingConnectionsThread.run(IncomingConnectionsThread.java:44)
+	  at java.lang.Thread.run(Thread.java:722)
+
+Attach Listener@422 daemon, prio=5, in group 'system', status: 'RUNNING'
+
+Signal Dispatcher@423 daemon, prio=9, in group 'system', status: 'RUNNING'
+
+Finalizer@424 daemon, prio=8, in group 'system', status: 'WAIT'
+	  at java.lang.Object.wait(Object.java:-1)
+	  at java.lang.ref.ReferenceQueue.remove(ReferenceQueue.java:135)
+	  at java.lang.ref.ReferenceQueue.remove(ReferenceQueue.java:151)
+	  at java.lang.ref.Finalizer$FinalizerThread.run(Finalizer.java:177)
+
+Reference Handler@425 daemon, prio=10, in group 'system', status: 'WAIT'
+	  at java.lang.Object.wait(Object.java:-1)
+	  at java.lang.Object.wait(Object.java:503)
+	  at java.lang.ref.Reference$ReferenceHandler.run(Reference.java:133)
+
+main@1, prio=5, in group 'main', status: 'RUNNING'
+	  at java.net.SocketInputStream.socketRead0(SocketInputStream.java:-1)
+	  at java.net.SocketInputStream.read(SocketInputStream.java:150)
+	  at java.net.SocketInputStream.read(SocketInputStream.java:121)
+	  at java.net.SocketInputStream.read(SocketInputStream.java:203)
+	  at java.io.DataInputStream.readInt(DataInputStream.java:387)
+	  at NetworkInfrastructure.NetworkCommands.Tag.CRequestRawTags.request(CRequestRawTags.java:41)
+	  at ConsistentHashing.DistributionManager.attachNewVirtualNode(DistributionManager.java:237)
+	  at ConsistentHashing.DistributionManager.attachNewTagVirtualNode(DistributionManager.java:146)
+	  at Interface.DatabaseAdministratorFacade.connectServerToDatabase(DatabaseAdministratorFacade.java:67)
+	  at ReallySlowTests.TestingSystemForNonResponsiveServers.testNonResponsiveServer(TestingSystemForNonResponsiveServers.java:39)
+	  at sun.reflect.NativeMethodAccessorImpl.invoke0(NativeMethodAccessorImpl.java:-1)
+	  at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:57)
+	  at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	  at java.lang.reflect.Method.invoke(Method.java:601)
+	  at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:45)
+	  at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:15)
+	  at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:42)
+	  at org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:20)
+	  at org.junit.internal.runners.statements.RunBefores.evaluate(RunBefores.java:28)
+	  at org.junit.runners.ParentRunner.runLeaf(ParentRunner.java:263)
+	  at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:68)
+	  at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:47)
+	  at org.junit.runners.ParentRunner$3.run(ParentRunner.java:231)
+	  at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:60)
+	  at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:229)
+	  at org.junit.runners.ParentRunner.access$000(ParentRunner.java:50)
+	  at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:222)
+	  at org.junit.runners.ParentRunner.run(ParentRunner.java:300)
+	  at org.junit.runner.JUnitCore.run(JUnitCore.java:157)
+	  at com.intellij.junit4.JUnit4IdeaTestRunner.startRunnerWithArgs(JUnit4IdeaTestRunner.java:77)
+	  at com.intellij.rt.execution.junit.JUnitStarter.prepareStreamsAndStart(JUnitStarter.java:195)
+	  at com.intellij.rt.execution.junit.JUnitStarter.main(JUnitStarter.java:63)
+

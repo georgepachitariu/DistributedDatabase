@@ -1,12 +1,13 @@
-package networkInfrastructure.NetworkCommands.Tag;
+package NetworkInfrastructure.NetworkCommands.Tag;
 
 import Data.DatabaseSystem;
-import networkInfrastructure.NetworkCommands.NetworkCommand;
-import networkInfrastructure.ServerNetworkInfo;
+import NetworkInfrastructure.NetworkCommands.NetworkCommand;
+import NetworkInfrastructure.ServerNetworkInfo;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.LinkedList;
 
 /**
  * Created with IntelliJ IDEA.
@@ -19,12 +20,13 @@ public class CGetServersResponsibleForTagHash extends NetworkCommand {
     //request members
     private long tagHash;
     // response members
-    private ServerNetworkInfo serverRequested;
+    private LinkedList<ServerNetworkInfo> serversRequested;
 
     public CGetServersResponsibleForTagHash(
             ServerNetworkInfo server, long tagHash ) {
         super(server);
         this.tagHash=tagHash;
+        this.serversRequested=new LinkedList<ServerNetworkInfo>();
     }
 
     @Override
@@ -36,15 +38,18 @@ public class CGetServersResponsibleForTagHash extends NetworkCommand {
     public boolean request() throws IOException {
         super.request();
 
-        //we send the ImageHash
+        //we send the TagHash
         out.writeLong(tagHash);
         out.flush();
 
-        //we read the Image
-        String response=super.in.readUTF();
-        if(response ==null)
-            return false;
-        this.serverRequested=new ServerNetworkInfo(response);
+        //we read the Addresses
+        int listNr=in.readInt();
+        for(int i=0; i< listNr; i++) {
+            String response=super.in.readUTF();
+            this.serversRequested.add(new ServerNetworkInfo(response));
+            out.writeBoolean(true);
+            out.flush();
+        }
 
         super.requestClose();
         return true;
@@ -53,16 +58,20 @@ public class CGetServersResponsibleForTagHash extends NetworkCommand {
     @Override
     public void respond(DataOutputStream out, DataInputStream in,
                         DatabaseSystem databaseSystem) throws IOException {
-        long imageHash=in.readLong();
-        ServerNetworkInfo server=databaseSystem.getDataDistributionManager().
-                getServersResponsibleForTagHash(imageHash);
+        long tagHash=in.readLong();
+        LinkedList<ServerNetworkInfo> servers=databaseSystem.getDataDistributionManager().
+                getServersResponsibleForTagHash(tagHash);
 
         // we send the image to the requester
-        out.writeUTF(server.toString());
-        out.flush();
+        out.writeInt(servers.size());
+        for(ServerNetworkInfo s : servers) {
+            out.writeUTF(s.toString());
+            out.flush();
+            if(! in.readBoolean()) return;
+        }
     }
 
-    public ServerNetworkInfo getServerRequested() {
-        return this.serverRequested;
+    public LinkedList<ServerNetworkInfo> getServersRequested() {
+        return this.serversRequested;
     }
 }

@@ -1,7 +1,7 @@
 package TestingFunctionality;
 
-import ConsistentHashing.HashRange;
-import ConsistentHashing.HashingFunction;
+import ConsistentHashing.HelpingClasses.HashRange;
+import ConsistentHashing.HelpingClasses.HashingFunction;
 import Data.LocalDataSystem;
 import Data.ImageWithMetadata;
 import Data.LocalImageStorage;

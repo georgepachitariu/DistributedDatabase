@@ -1,9 +1,8 @@
-package networkInfrastructure.NetworkCommands.Tag;
+package NetworkInfrastructure.NetworkCommands.Tag;
 
-import ConsistentHashing.HashingFunction;
 import Data.DatabaseSystem;
-import networkInfrastructure.NetworkCommands.NetworkCommand;
-import networkInfrastructure.ServerNetworkInfo;
+import NetworkInfrastructure.NetworkCommands.NetworkCommand;
+import NetworkInfrastructure.ServerNetworkInfo;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -16,13 +15,13 @@ import java.io.IOException;
  * Time: 2:50 PM
  */
 public class CDeleteTag extends NetworkCommand  {
-        private String tag;
+        private long  tagHash;
         private long imageValueHash;
 
-        public CDeleteTag(ServerNetworkInfo destination, String tag, long imageValueHash) {
+        public CDeleteTag(ServerNetworkInfo destination, long tagHash, long imageValueHash) {
             super(destination);
             this.imageValueHash=imageValueHash;
-            this.tag=tag;
+            this.tagHash=tagHash;
     }
 
         @Override
@@ -34,8 +33,6 @@ public class CDeleteTag extends NetworkCommand  {
         public boolean request() throws IOException {
         super.request();
 
-
-        long tagHash = new HashingFunction().getTagHash(tag);
         //we send the Tag
         out.writeLong(tagHash);
         out.writeLong(imageValueHash);

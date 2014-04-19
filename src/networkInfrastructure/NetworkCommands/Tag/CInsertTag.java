@@ -1,8 +1,8 @@
-package networkInfrastructure.NetworkCommands.Tag;
+package NetworkInfrastructure.NetworkCommands.Tag;
 
 import Data.DatabaseSystem;
-import networkInfrastructure.NetworkCommands.NetworkCommand;
-import networkInfrastructure.ServerNetworkInfo;
+import NetworkInfrastructure.NetworkCommands.NetworkCommand;
+import NetworkInfrastructure.ServerNetworkInfo;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;

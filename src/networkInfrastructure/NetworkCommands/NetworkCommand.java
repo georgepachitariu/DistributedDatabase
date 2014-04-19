@@ -1,9 +1,11 @@
-package networkInfrastructure.NetworkCommands;
+package NetworkInfrastructure.NetworkCommands;
 
 import Data.DatabaseSystem;
-import networkInfrastructure.ServerNetworkInfo;
+import NetworkInfrastructure.ServerNetworkInfo;
 
-import java.io.*;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.Arrays;
@@ -23,7 +25,7 @@ public abstract class NetworkCommand {
 
     public boolean request()  throws IOException {
         this.socket = new Socket();
-        socket.connect(new InetSocketAddress(server.getIP(), server.getPort()));
+        socket.connect(new InetSocketAddress(server.getIP(), server.getPort()),1000);
 
         this.out = new DataOutputStream ( socket.getOutputStream());
         this.in = new DataInputStream (socket.getInputStream());

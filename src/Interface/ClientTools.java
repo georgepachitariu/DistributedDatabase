@@ -1,12 +1,10 @@
 package Interface;
 
-import networkInfrastructure.NetworkCommands.CGetServerOperationsLoadNumber;
-import networkInfrastructure.NetworkCommands.Image.CGetServersResponsibleForImageHash;
-import networkInfrastructure.NetworkCommands.Tag.CGetServersResponsibleForTagHash;
-import networkInfrastructure.ServerNetworkInfo;
+import NetworkInfrastructure.NetworkCommands.Image.CGetServersResponsibleForImageHash;
+import NetworkInfrastructure.NetworkCommands.Tag.CGetServersResponsibleForTagHash;
+import NetworkInfrastructure.ServerNetworkInfo;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.LinkedList;
 
 /**
@@ -32,52 +30,28 @@ public class ClientTools {
         }
     }
 
-    public ServerNetworkInfo getFreeServerFrom(LinkedList<ServerNetworkInfo> list) {
-
-        LinkedList<structure>listLoadNumbers=new LinkedList<structure>();
-
-        for(int i=0; i<list.size(); i++) {
-            int load=getServerLoad(list.get(i));
-            listLoadNumbers.add(new structure(load, i));
-        }
-
-        Collections.sort(listLoadNumbers);
-        return list.get( listLoadNumbers.getFirst().position );
-    }
-
-    public int getServerLoad(ServerNetworkInfo serverNetworkInfo) {
-
-        try {
-            CGetServerOperationsLoadNumber command=
-                    new CGetServerOperationsLoadNumber(serverNetworkInfo);
-            command.request();
-            return command.getLoadNumber();
-        } catch (IOException e) {        }
-        return -1;
-    }
-
-    public ServerNetworkInfo
-        getServerResponsibleForImageHash(ServerNetworkInfo server, long imageHash) {
+    public LinkedList<ServerNetworkInfo>
+        getServersResponsibleForImageHash(ServerNetworkInfo server, long imageHash) {
 
         try{
         CGetServersResponsibleForImageHash command=
                 new CGetServersResponsibleForImageHash(server,imageHash);
         command.request();
-        return command.getServerRequested();
+        return command.getServersRequested();
         } catch (IOException e) {
             e.printStackTrace();
+            return null;
         }
-        return null;
     }
 
-    public ServerNetworkInfo
-        getServerResponsibleForTag(ServerNetworkInfo server, long tagHash) {
+    public LinkedList<ServerNetworkInfo>
+        getServersResponsibleForTag(ServerNetworkInfo server, long tagHash) {
 
         try{
             CGetServersResponsibleForTagHash command=
                     new CGetServersResponsibleForTagHash(server,tagHash);
             command.request();
-            return command.getServerRequested();
+            return command.getServersRequested();
         } catch (IOException e) {
             e.printStackTrace();
         }

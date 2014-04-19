@@ -1,7 +1,6 @@
 package ConsistentHashing;
 
-import ConsistentHashing.HelpingClasses.ServerSegmentsStruct;
-import networkInfrastructure.ServerNetworkInfo;
+import NetworkInfrastructure.ServerNetworkInfo;
 
 import java.util.LinkedList;
 
@@ -14,10 +13,8 @@ import java.util.LinkedList;
 public interface ServerDistributionManager {
     public long getMaxImageHashValue() ;
     public long getMaxTagHashValue();
-    public HashRange getNewDataVirtualNode( ServerSegmentsStruct currentServer,
-                                            LinkedList<ServerSegmentsStruct> existingServers  );
-    public HashRange getNewTagVirtualNode( ServerSegmentsStruct currentServer,
-                                           LinkedList<ServerSegmentsStruct> existingServers  );
+    public void attachNewDataVirtualNode( );
+    public void attachNewTagVirtualNode( );
     public LinkedList<ServerNetworkInfo> getServersAddresses();
 
 }

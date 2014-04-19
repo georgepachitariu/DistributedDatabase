@@ -1,7 +1,7 @@
 package Interface;
 
-import networkInfrastructure.NetworkCommands.CGetServersAddresses;
-import networkInfrastructure.ServerNetworkInfo;
+import NetworkInfrastructure.NetworkCommands.CGetServersAddresses;
+import NetworkInfrastructure.ServerNetworkInfo;
 
 import java.io.IOException;
 

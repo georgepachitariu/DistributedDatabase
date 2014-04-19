@@ -1,12 +1,13 @@
-package networkInfrastructure.NetworkCommands.Image;
+package NetworkInfrastructure.NetworkCommands.Image;
 
 import Data.DatabaseSystem;
-import networkInfrastructure.NetworkCommands.NetworkCommand;
-import networkInfrastructure.ServerNetworkInfo;
+import NetworkInfrastructure.NetworkCommands.NetworkCommand;
+import NetworkInfrastructure.ServerNetworkInfo;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.LinkedList;
 
 /**
  * Created with IntelliJ IDEA.
@@ -19,12 +20,13 @@ public class CGetServersResponsibleForImageHash extends NetworkCommand {
     //request members
     private long imageHash;
     // response members
-    private ServerNetworkInfo serverRequested;
+    private LinkedList<ServerNetworkInfo> serversRequested;
 
     public CGetServersResponsibleForImageHash(
             ServerNetworkInfo server, long imageHash ) {
         super(server);
         this.imageHash=imageHash;
+        this.serversRequested=new LinkedList<ServerNetworkInfo>();
     }
 
     @Override
@@ -40,11 +42,14 @@ public class CGetServersResponsibleForImageHash extends NetworkCommand {
         out.writeLong(imageHash);
         out.flush();
 
-        //we read the Address
-        String response=super.in.readUTF();
-        if(response ==null)
-            return false;
-        this.serverRequested=new ServerNetworkInfo(response);
+        //we read the Addresses
+        int listNr=in.readInt();
+        for(int i=0; i< listNr; i++) {
+            String response=super.in.readUTF();
+            this.serversRequested.add(new ServerNetworkInfo(response));
+            out.writeBoolean(true);
+            out.flush();
+        }
 
         super.requestClose();
         return true;
@@ -54,15 +59,19 @@ public class CGetServersResponsibleForImageHash extends NetworkCommand {
     public void respond(DataOutputStream out, DataInputStream in,
                         DatabaseSystem databaseSystem) throws IOException {
         long imageHash=in.readLong();
-        ServerNetworkInfo server=databaseSystem.getDataDistributionManager().
+        LinkedList<ServerNetworkInfo> servers=databaseSystem.getDataDistributionManager().
                 getServersResponsibleForImageHash(imageHash);
 
         // we send the address to the requester
-        out.writeUTF(server.toString());
-        out.flush();
+        out.writeInt(servers.size());
+        for(ServerNetworkInfo s : servers) {
+            out.writeUTF(s.toString());
+            out.flush();
+            if(! in.readBoolean()) return;
+        }
     }
 
-    public ServerNetworkInfo getServerRequested() {
-        return this.serverRequested;
+    public LinkedList<ServerNetworkInfo> getServersRequested() {
+        return this.serversRequested;
     }
 }

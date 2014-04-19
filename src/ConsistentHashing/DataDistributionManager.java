@@ -1,6 +1,8 @@
 package ConsistentHashing;
 
-import networkInfrastructure.ServerNetworkInfo;
+import NetworkInfrastructure.ServerNetworkInfo;
+
+import java.util.LinkedList;
 
 /**
  * Created with IntelliJ IDEA.
@@ -9,7 +11,7 @@ import networkInfrastructure.ServerNetworkInfo;
  * Time: 10:36 AM
  */
 public interface DataDistributionManager {
-    public ServerNetworkInfo getServersResponsibleForImageHash(long imageHash);
-    public ServerNetworkInfo getServersResponsibleForTagHash(long tagHash);
+    public LinkedList<ServerNetworkInfo> getServersResponsibleForImageHash(long imageHash);
+    public LinkedList<ServerNetworkInfo> getServersResponsibleForTagHash(long tagHash);
 
 }

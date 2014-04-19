@@ -1,7 +1,6 @@
 package ConsistentHashing.HelpingClasses;
 
-import ConsistentHashing.HashRange;
-import networkInfrastructure.ServerNetworkInfo;
+import NetworkInfrastructure.ServerNetworkInfo;
 
 import java.util.LinkedList;
 

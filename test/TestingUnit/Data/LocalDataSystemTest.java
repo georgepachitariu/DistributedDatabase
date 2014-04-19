@@ -1,6 +1,6 @@
 package TestingUnit.Data;
 
-import ConsistentHashing.HashingFunction;
+import ConsistentHashing.HelpingClasses.HashingFunction;
 import Data.LocalDataSystem;
 import Data.ImageWithMetadata;
 import Data.LocalImageStorage;

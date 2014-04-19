@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="DistributedDatabase">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/out/artifacts/DistributedDatabase_jar/DistributedDatabase.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

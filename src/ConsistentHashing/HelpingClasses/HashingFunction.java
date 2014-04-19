@@ -1,5 +1,6 @@
-package ConsistentHashing;
+package ConsistentHashing.HelpingClasses;
 
+import ConsistentHashing.DistributionManager;
 import Data.ImageWithMetadata;
 
 /**
@@ -11,12 +12,12 @@ import Data.ImageWithMetadata;
 public class HashingFunction {
 
     public long getImageHash(ImageWithMetadata image)  {
-        long maxRange = new DistributionManager().getMaxImageHashValue();
-        return Math.abs(image.raw.hashCode()) %maxRange;
+        long maxRange = new DistributionManager(1,1).getMaxImageHashValue();
+        return Math.abs(image.hashCode()) %maxRange;
      }
 
      public long getTagHash(String tag)  {
-         long maxTagRange = new DistributionManager().getMaxTagHashValue();
+         long maxTagRange = new DistributionManager(1,1).getMaxTagHashValue();
          return Math.abs(tag.hashCode()) %maxTagRange;
      }
 }

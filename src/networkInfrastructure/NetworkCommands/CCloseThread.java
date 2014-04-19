@@ -1,7 +1,7 @@
-package networkInfrastructure.NetworkCommands;
+package NetworkInfrastructure.NetworkCommands;
 
 import Data.DatabaseSystem;
-import networkInfrastructure.ServerNetworkInfo;
+import NetworkInfrastructure.ServerNetworkInfo;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;

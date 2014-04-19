@@ -1,4 +1,4 @@
-package ConsistentHashing;
+package ConsistentHashing.HelpingClasses;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -32,6 +32,13 @@ public class HashRange {
     public String toString() {
         return String.valueOf(this.startPoint) +"_" +
                 String.valueOf(this.endPoint);
+    }
+
+    @Override
+    public boolean equals(Object a) {
+        if(((HashRange)a).toString().equals( this.toString()))
+            return true;
+        return false;
     }
 
     public byte[] toBytes() {

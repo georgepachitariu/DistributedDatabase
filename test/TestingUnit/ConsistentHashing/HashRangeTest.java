@@ -1,6 +1,6 @@
 package TestingUnit.ConsistentHashing;
 
-import ConsistentHashing.HashRange;
+import ConsistentHashing.HelpingClasses.HashRange;
 import junit.framework.Assert;
 import org.junit.Test;
 
@@ -19,13 +19,4 @@ public class HashRangeTest {
         Assert.assertEquals(a.startPoint,b.startPoint);
         Assert.assertEquals(a.endPoint,b.endPoint);
     }
-
-    /*@Test
-    public void simpleTest() {
-        LocalImageStorage lis= new LocalImageStorage(
-                "test/DemoStorage/1/", new HashRange(0, 170));
-
-        LinkedList<ImageWithMetadata> returnL =
-                lis.getAllImagesInRange(new HashRange(0, 170));
-    }*/
 }

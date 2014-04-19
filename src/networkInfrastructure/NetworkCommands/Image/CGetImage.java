@@ -1,9 +1,9 @@
-package networkInfrastructure.NetworkCommands.Image;
+package NetworkInfrastructure.NetworkCommands.Image;
 
 import Data.DatabaseSystem;
 import Data.ImageWithMetadata;
-import networkInfrastructure.NetworkCommands.NetworkCommand;
-import networkInfrastructure.ServerNetworkInfo;
+import NetworkInfrastructure.NetworkCommands.NetworkCommand;
+import NetworkInfrastructure.ServerNetworkInfo;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;

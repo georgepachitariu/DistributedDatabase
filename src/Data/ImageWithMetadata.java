@@ -42,11 +42,6 @@ public class ImageWithMetadata {
         }
     }
 
-/*    public ImageWithMetadata(String rawImg) {
-        byte[]img =rawImg.getBytes();
-        this.createObjectFromRaw(img);
-    }*/
-
     @Override
     public boolean equals(Object o) {
         if(Arrays.equals(this.toBytes(),((ImageWithMetadata)o).toBytes()))
@@ -57,6 +52,11 @@ public class ImageWithMetadata {
     @Override
     public String toString(){
         return null;
+    }
+
+    @Override
+    public int hashCode() {
+        return new String(this.toBytes()).hashCode();
     }
 
     private void createObjectFromRaw(byte[] raw) {
